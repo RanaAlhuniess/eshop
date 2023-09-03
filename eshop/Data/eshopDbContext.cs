@@ -1,6 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using eshop.Entities;
+using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
+using Volo.Abp.Domain.Entities;
 using Volo.Abp.EntityFrameworkCore;
+using Volo.Abp.EntityFrameworkCore.Modeling;
 using Volo.Abp.FeatureManagement.EntityFrameworkCore;
 using Volo.Abp.Identity.EntityFrameworkCore;
 using Volo.Abp.OpenIddict.EntityFrameworkCore;
@@ -16,6 +19,7 @@ public class eshopDbContext : AbpDbContext<eshopDbContext>
         : base(options)
     {
     }
+    public DbSet<Product> Products { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -32,5 +36,10 @@ public class eshopDbContext : AbpDbContext<eshopDbContext>
         builder.ConfigureTenantManagement();
 
         /* Configure your own entities here */
+        builder.Entity<Product>(b =>
+        {
+            b.ToTable("Products");
+            b.ConfigureAudited();
+        });
     }
 }

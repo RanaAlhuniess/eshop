@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.EntityFrameworkCore;
 using eshop.Data;
@@ -12,9 +13,11 @@ using eshop.Data;
 namespace eshop.Migrations
 {
     [DbContext(typeof(eshopDbContext))]
-    partial class eshopDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230903192742_Updated_Product")]
+    partial class UpdatedProduct
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

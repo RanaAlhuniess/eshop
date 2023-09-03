@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.OpenApi.Models;
 using eshop.Data;
@@ -101,7 +101,8 @@ namespace eshop;
     typeof(AbpSettingManagementHttpApiModule),
     typeof(AbpSettingManagementWebModule)
 )]
-public class eshopModule : AbpModule
+[DependsOn(typeof(AbpEntityFrameworkCoreModule))]
+    public class eshopModule : AbpModule
 {
     /* Single point to enable/disable multi-tenancy */
     public const bool IsMultiTenant = true;
