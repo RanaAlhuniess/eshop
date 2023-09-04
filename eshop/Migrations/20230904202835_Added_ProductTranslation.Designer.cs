@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.EntityFrameworkCore;
 using eshop.Data;
@@ -12,9 +13,11 @@ using eshop.Data;
 namespace eshop.Migrations
 {
     [DbContext(typeof(eshopDbContext))]
-    partial class eshopDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230904202835_Added_ProductTranslation")]
+    partial class AddedProductTranslation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1751,6 +1754,9 @@ namespace eshop.Migrations
                     b.Property<Guid>("LanguageId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("LanguageId1")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime?>("LastModificationTime")
                         .HasColumnType("datetime2")
                         .HasColumnName("LastModificationTime");
@@ -1767,11 +1773,18 @@ namespace eshop.Migrations
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("ProductId1")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.HasIndex("LanguageId");
 
+                    b.HasIndex("LanguageId1");
+
                     b.HasIndex("ProductId");
+
+                    b.HasIndex("ProductId1");
 
                     b.ToTable("ProductTranslations", (string)null);
                 });
@@ -1920,15 +1933,27 @@ namespace eshop.Migrations
 
             modelBuilder.Entity("eshop.Entities.ProductTranslation", b =>
                 {
-                    b.HasOne("eshop.Entities.Language", "Language")
+                    b.HasOne("eshop.Entities.Language", null)
                         .WithMany()
                         .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("eshop.Entities.Language", "Language")
+                        .WithMany()
+                        .HasForeignKey("LanguageId1")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("eshop.Entities.Product", null)
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("eshop.Entities.Product", "Product")
                         .WithMany()
-                        .HasForeignKey("ProductId")
+                        .HasForeignKey("ProductId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

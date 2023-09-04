@@ -20,6 +20,8 @@ public class eshopDbContext : AbpDbContext<eshopDbContext>
     {
     }
     public DbSet<Product> Products { get; set; }
+    public DbSet<Language> Languages { get; set; }
+    public DbSet<ProductTranslation> ProductTranslations { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -39,6 +41,15 @@ public class eshopDbContext : AbpDbContext<eshopDbContext>
         builder.Entity<Product>(b =>
         {
             b.ToTable("Products");
+            b.ConfigureAudited();
+        });
+        builder.Entity<Language>(b =>
+        {
+            b.ToTable("Languages");
+        });
+        builder.Entity<ProductTranslation>(b =>
+        {
+            b.ToTable("ProductTranslations");
             b.ConfigureAudited();
         });
     }

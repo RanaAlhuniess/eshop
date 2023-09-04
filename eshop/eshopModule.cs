@@ -48,6 +48,8 @@ using Volo.Abp.UI.Navigation;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.Validation.Localization;
 using Volo.Abp.VirtualFileSystem;
+using Volo.Abp.Data;
+using eshop.DataSeed;
 
 namespace eshop;
 
@@ -125,6 +127,10 @@ namespace eshop;
 				options.UseAspNetCore();
 			});
 		});
+        //Configure<AbpDataSeedOptions>(options =>
+        //{
+        //    options.DataSeeders<LanguageDataSeedContributor>();
+        //});
     }
 
     public override void ConfigureServices(ServiceConfigurationContext context)
@@ -340,5 +346,10 @@ namespace eshop;
         app.UseAuditing();
         app.UseAbpSerilogEnrichers();
         app.UseConfiguredEndpoints();
+        using (var scope = context.ServiceProvider.CreateScope())
+        {
+            var languageDataSeed = scope.ServiceProvider.GetRequiredService<LanguageDataSeedContributor>();
+            languageDataSeed.SeedAsync(new DataSeedContext()).GetAwaiter().GetResult();
+        }
     }
 }
