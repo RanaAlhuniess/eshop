@@ -1,4 +1,4 @@
-﻿namespace eshop.Services.Dtos
+﻿namespace eshop.Services.Dtos.Product
 {
     public class ProductTranslationDto
     {

@@ -1,5 +1,5 @@
 ﻿using eshop.Entities;
-using eshop.Services.Dtos;
+using eshop.Services.Dtos.Product;
 using eshop.Services.Helpers;
 using Volo.Abp;
 using Volo.Abp.Application.Services;
