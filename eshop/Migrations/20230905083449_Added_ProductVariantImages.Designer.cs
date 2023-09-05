@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.EntityFrameworkCore;
 using eshop.Data;
@@ -12,9 +13,11 @@ using eshop.Data;
 namespace eshop.Migrations
 {
     [DbContext(typeof(eshopDbContext))]
-    partial class eshopDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230905083449_Added_ProductVariantImages")]
+    partial class AddedProductVariantImages
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1783,10 +1786,8 @@ namespace eshop.Migrations
                         .HasDefaultValue(false)
                         .HasColumnName("IsDeleted");
 
-                    b.Property<string>("LanguageCode")
-                        .IsRequired()
-                        .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)");
+                    b.Property<Guid>("LanguageId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("LastModificationTime")
                         .HasColumnType("datetime2")
@@ -1806,8 +1807,9 @@ namespace eshop.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductId", "LanguageCode")
-                        .IsUnique();
+                    b.HasIndex("LanguageId");
+
+                    b.HasIndex("ProductId");
 
                     b.ToTable("ProductTranslations", (string)null);
                 });
@@ -2109,11 +2111,19 @@ namespace eshop.Migrations
 
             modelBuilder.Entity("eshop.Entities.ProductTranslation", b =>
                 {
+                    b.HasOne("eshop.Entities.Language", "Language")
+                        .WithMany()
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("eshop.Entities.Product", "Product")
-                        .WithMany("Translations")
+                        .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Language");
 
                     b.Navigation("Product");
                 });
@@ -2197,11 +2207,6 @@ namespace eshop.Migrations
             modelBuilder.Entity("Volo.Abp.TenantManagement.Tenant", b =>
                 {
                     b.Navigation("ConnectionStrings");
-                });
-
-            modelBuilder.Entity("eshop.Entities.Product", b =>
-                {
-                    b.Navigation("Translations");
                 });
 
             modelBuilder.Entity("eshop.Entities.ProductAttributeVariant", b =>

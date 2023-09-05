@@ -18,5 +18,6 @@ public class Product : FullAuditedAggregateRoot<Guid>
 
 
     public bool IsActive { get; set; }
+    public virtual ICollection<ProductTranslation> Translations { get; set; }
 
 }
