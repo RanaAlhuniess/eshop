@@ -9,7 +9,7 @@ namespace eshop.Entities
         [Required]
         [StringLength(255)]
         public string Name { get; set; }
-        public ProductAttribute ProductAttribute { get; set; }
+        public virtual ProductAttribute ProductAttribute { get; set; }
         public virtual ICollection<ProductVariantValue> VariantAttributes { get; set; }
 
     }

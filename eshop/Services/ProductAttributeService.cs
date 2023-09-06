@@ -1,6 +1,5 @@
 ﻿using eshop.Entities;
 using eshop.Services.Dtos.ProductAttribute;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
@@ -58,7 +57,7 @@ public class ProductAttributeService : ApplicationService
         return query;
     }
 
-    public async Task<Guid> CreateAsync(ProductAttributeDto productAttributeDto)
+    public async Task<Guid> CreateAsync(CreateProductAttributeDto productAttributeDto)
     {
         try
         {
@@ -68,20 +67,22 @@ public class ProductAttributeService : ApplicationService
             {
                 Name = productAttributeDto.Name
             };
+            await _productAttributeRepository.InsertAsync(productAttribute, true);
 
-            productAttribute.Variants ??= new List<ProductAttributeVariant>();
+            var variantsToInsert = new List<ProductAttributeVariant>();
 
             foreach (var variantDto in productAttributeDto.Variants)
             {
                 var variant = new ProductAttributeVariant
                 {
+                    ProductAttributeId = productAttribute.Id,
+                    ProductAttribute = productAttribute,
                     Name = variantDto.Name
                 };
 
-                productAttribute.Variants.Add(variant);
+                variantsToInsert.Add(variant);
             }
-
-            await _productAttributeRepository.InsertAsync(productAttribute, true);
+            await _productAttributeVariantRepository.InsertManyAsync(variantsToInsert);
 
             return productAttribute.Id;
         }
@@ -142,25 +143,8 @@ public class ProductAttributeService : ApplicationService
 
             await _productAttributeVariantRepository.DeleteManyAsync(variantsToRemove);
 
-            var variantsToInsert = new List<ProductAttributeVariant>();
-            foreach (var newValue in productAttributeDto.Variants)
-            {
-                if (newValue.Id == null)
-                {
-                    var newVariant = new ProductAttributeVariant
-                    {
-                        ProductAttributeId = productAttribute.Id,
-                        Name = newValue.Name
-                    };
+            await InsertProductAttributeVariants(productAttributeDto.Variants, productAttribute);
 
-                    variantsToInsert.Add(newVariant);
-                }
-            }
-            if (variantsToInsert.Any())
-            {
-                await _productAttributeVariantRepository.InsertManyAsync(variantsToInsert);
-            }
-           
             await CurrentUnitOfWork.SaveChangesAsync();
 
             await uow.CompleteAsync(); 
@@ -172,4 +156,27 @@ public class ProductAttributeService : ApplicationService
         }
     }
 
+    private async Task InsertProductAttributeVariants(List<ProductAttributeVariantDto> variants,
+        ProductAttribute productAttribute)
+    {
+        var variantsToInsert = new List<ProductAttributeVariant>();
+        foreach (var variant in variants)
+        {
+            if (variant.Id == null)
+            {
+                var newVariant = new ProductAttributeVariant
+                {
+                    ProductAttributeId = productAttribute.Id,
+                    Name = variant.Name
+                };
+
+                variantsToInsert.Add(newVariant);
+            }
+        }
+
+        if (variantsToInsert.Any())
+        {
+            await _productAttributeVariantRepository.InsertManyAsync(variantsToInsert);
+        }
+    }
 }
