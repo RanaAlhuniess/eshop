@@ -34,7 +34,7 @@ public class ProductAttributeService : ApplicationService
             if (!string.IsNullOrEmpty(input.Filter))
                 query = query.Where(attribute => attribute.Name.Contains(input.Filter));
 
-            query = ApplySorting(query, input.Sorting);
+            if (input.Sorting != null) query = ApplySorting(query, input.Sorting);
 
             var totalCount = await AsyncExecuter.CountAsync(query);
             var attributes = await AsyncExecuter.ToListAsync(query.PageBy(input));
