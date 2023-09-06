@@ -8,5 +8,13 @@ namespace eshop.Entities
         [Required]
         [StringLength(255)]
         public string Name { get; set; }
+
+        public virtual ICollection<ProductAttributeVariant> Variants{ get; set; }
+
+        public ProductAttribute()
+        {
+            Variants = new List<ProductAttributeVariant>();
+        }
     }
+
 }

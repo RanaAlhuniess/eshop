@@ -60,7 +60,7 @@ public class ProductAppService : ApplicationService
         }
     }
 
-    public bool ValidateLanguageCode(string languageCode)
+    private bool ValidateLanguageCode(string languageCode)
     {
         return TranslationHelper.IsLanguageCodeValid(languageCode);
     }
