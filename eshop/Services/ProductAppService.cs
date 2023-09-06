@@ -12,13 +12,15 @@ public class ProductAppService : ApplicationService
 {
     private readonly IRepository<Product, Guid> _productRepository;
     private readonly IRepository<ProductVariant, Guid> _productVariantRepository;
-
+    private readonly IRepository<ProductVariantValue, Guid> _productVariantValueRepository;
 
     public ProductAppService(IRepository<Product, Guid> productRepository,
-        IRepository<ProductVariant, Guid> productVariantRepository)
+        IRepository<ProductVariant, Guid> productVariantRepository,
+        IRepository<ProductVariantValue, Guid> productVariantValueRepository)
     {
         _productRepository = productRepository;
         _productVariantRepository = productVariantRepository;
+        _productVariantValueRepository = productVariantValueRepository;
     }
 
     public async Task<Guid> CreateProductWithTranslationsAsync(ProductDto productDto)
@@ -64,40 +66,54 @@ public class ProductAppService : ApplicationService
 
     public async Task CreateProductVariantAsync(Guid id, List<CreateProductVariantDto> input)
     {
-        var product = await _productRepository.GetAsync(id);
-
-        if (product == null) throw new EntityNotFoundException(typeof(Product), id);
-
-        foreach (var variantDto in input)
+        try
         {
-            var productVariant = new ProductVariant
-            {
-                ProductId = product.Id,
-                Code = variantDto.Code,
-                Price = variantDto.Price
-            };
-            productVariant.VariantValues ??= new List<ProductVariantValue>();
-            foreach (var attributeVariantId in variantDto.AttributeVariantIds)
-            {
-                //TODO: Should check if we check if each attributeVariantId corresponds to an existing attribute variant that belongs to the same product
-                //var attributeVariant = await _attributeVariantRepository
-                //    .FirstOrDefaultAsync(av => av.Id == attributeVariantId && av.AttributeId == product.AttributeId);
 
-                var productVariantValue = new ProductVariantValue
+            var product = await _productRepository.GetAsync(id);
+
+            if (product == null) throw new EntityNotFoundException(typeof(Product), id);
+
+            foreach (var variantDto in input)
+            {
+                var productVariant = new ProductVariant
                 {
-                    ProductVariant = productVariant,
-                    ProductAttributeVariantId = attributeVariantId
+                    ProductId = product.Id,
+                    Code = variantDto.Code,
+                    Price = variantDto.Price
                 };
+                await _productVariantRepository.InsertAsync(productVariant);
 
-                productVariant.VariantValues.Add(productVariantValue);
+                productVariant.VariantValues ??= new List<ProductVariantValue>();
+                var variantValuesToInsert = new List<ProductVariantValue>();
+                foreach (var attributeVariantId in variantDto.AttributeVariantIds)
+                {
+                    
+                    var existingValue = variantValuesToInsert
+                        .FirstOrDefault(v => v.ProductAttributeVariantId == attributeVariantId);
+                    if (existingValue == null)
+                    {
+                        var productVariantValue = new ProductVariantValue
+                        {
+                            ProductVariant = productVariant,
+                            ProductAttributeVariantId = attributeVariantId
+                        };
+
+                        variantValuesToInsert.Add(productVariantValue);
+                    }
+
+                }
+                await _productVariantValueRepository.InsertManyAsync(variantValuesToInsert);
+
             }
 
-            await _productVariantRepository.InsertAsync(productVariant);
+            await CurrentUnitOfWork.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
         }
 
-        await CurrentUnitOfWork.SaveChangesAsync();
-
-     
     }
 
 
