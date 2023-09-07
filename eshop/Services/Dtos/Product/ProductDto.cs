@@ -6,5 +6,6 @@
         public int? ProductVariantImageId { get; set; }
         public bool IsActive { get; set; }
         public List<ProductTranslationDto> Translations { get; set; }
+        public List<ProductVariantDto> Variants { get; set; }
     }
 }

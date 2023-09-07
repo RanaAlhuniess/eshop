@@ -33,7 +33,7 @@ public class ProductAttributeService : ApplicationService
             if (!string.IsNullOrEmpty(input.Filter))
                 query = query.Where(attribute => attribute.Name.Contains(input.Filter));
 
-            if (input.Sorting != null) query = ApplySorting(query, input.Sorting);
+            query = ApplySorting(query, input.Sorting);
 
             var totalCount = await AsyncExecuter.CountAsync(query);
             var attributes = await AsyncExecuter.ToListAsync(query.PageBy(input));
@@ -121,7 +121,7 @@ public class ProductAttributeService : ApplicationService
         await _productAttributeRepository.UpdateAsync(productAttribute, true);
     }
 
-    public async Task UpdateAttributeAndValuesAsync(Guid id,ProductAttributeDto productAttributeDto)
+    public async Task UpdateAttributeAndVariantsAsync(Guid id,ProductAttributeDto productAttributeDto)
     {
         using var uow = UnitOfWorkManager.Begin();
         try

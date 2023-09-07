@@ -7,7 +7,7 @@ namespace eshop.Entities
         public Guid ProductVariantId { get; set; }
         public Guid ProductAttributeVariantId { get; set; }
 
-        public virtual ProductVariant ProductVariant { get; set; }
-        public virtual ProductAttributeVariant ProductAttributeVariant { get; set; }
+        public  ProductVariant ProductVariant { get; set; }
+        public  ProductAttributeVariant ProductAttributeVariant { get; set; }
     }
 }

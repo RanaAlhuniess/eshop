@@ -8,6 +8,7 @@ public class Product : FullAuditedAggregateRoot<Guid>
     public Product()
     {
         IsActive = true;
+        Variants = new List<ProductVariant>();
     }
 
     public Guid? ProductVariantImageId { get; set; }
@@ -19,5 +20,5 @@ public class Product : FullAuditedAggregateRoot<Guid>
 
     public bool IsActive { get; set; }
     public virtual ICollection<ProductTranslation> Translations { get; set; }
-
+    public virtual ICollection<ProductVariant> Variants { get; set; }
 }
